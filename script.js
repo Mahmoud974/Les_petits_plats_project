@@ -1,3 +1,4 @@
+//la méthode de la boucle de for
 let data = {};
 let li;
 let matchingRecipes;
