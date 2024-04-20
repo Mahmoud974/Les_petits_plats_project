@@ -1,17 +1,17 @@
-//la méthode de la boucle de for
-let data = {};
-let li;
-let matchingRecipes;
-let filteredRecipes;
-let allIngredients = [];
-let allAppliances = [];
-let allUtensils = [];
-let array = [];
-let deviceList;
-let searchInput;
-let searchTerm;
-let searchBool = false;
-let selectedLabels = [];
+//Boucle de la méthode Map & forEach
+let data = {},
+  li,
+  matchingRecipes,
+  filteredRecipes;
+let allIngredients = [],
+  allAppliances = [],
+  allUtensils = [],
+  array = [],
+  deviceList,
+  searchInput,
+  searchTerm,
+  searchBool = false,
+  selectedLabels = [];
 let tagTab = [];
 let totalPillsCreated = 0;
 let matchingRecipe;
@@ -51,19 +51,19 @@ const extractElements = async () => {
     matchingRecipe = matchingRecipes ? matchingRecipes : await data.recipes;
   }
 
-  for (let i = 0; i < matchingRecipe.length; i++) {
-    const recipe = matchingRecipe[i];
-    for (let j = 0; j < recipe.ingredients.length; j++) {
-      const { ingredient: name } = recipe.ingredients[j];
-      allIngredients.push(name);
-    }
-    const { appliance } = recipe;
-    allAppliances.push(appliance);
+  matchingRecipe &&
+    matchingRecipe.forEach((recipe) => {
+      recipe.ingredients.forEach((ingredient) => {
+        const { ingredient: name } = ingredient;
+        allIngredients.push(name);
+      });
+      const { appliance } = recipe;
+      allAppliances.push(appliance);
 
-    for (let k = 0; k < recipe.ustensils.length; k++) {
-      allUtensils.push(recipe.ustensils[k]);
-    }
-  }
+      recipe.ustensils.forEach((utensil) => {
+        allUtensils.push(utensil);
+      });
+    });
 
   applyFilters();
   click_Element_In_The_Dropdown("dropdown_device", "ustensil");
@@ -151,25 +151,23 @@ const dataRecipe = async (dataType, searchTerm) => {
     let array = [];
     let sortedData = [];
     if (dataType === "ingredients") {
-      for (let i = 0; i < data.recipes.length; i++) {
-        const recipe = data.recipes[i];
-        for (let j = 0; j < recipe.ingredients.length; j++) {
-          array.push(recipe.ingredients[j].ingredient.toLowerCase());
-        }
-      }
+      data.recipes.forEach((recipe) => {
+        recipe.ingredients.forEach((ingredient) => {
+          array.push(ingredient.ingredient.toLowerCase());
+        });
+      });
       sortedData = sortData(array, searchTerm);
     } else if (dataType === "appliance") {
-      for (let i = 0; i < data.recipes.length; i++) {
-        array.push(data.recipes[i].appliance);
-      }
+      data.recipes.forEach((recipe) => {
+        array.push(recipe.appliance);
+      });
       sortedData = sortData(array, searchTerm);
     } else if (dataType === "ustensils") {
-      for (let i = 0; i < data.recipes.length; i++) {
-        const recipe = data.recipes[i];
-        for (let j = 0; j < recipe.ustensils.length; j++) {
-          array.push(recipe.ustensils[j].toLowerCase());
-        }
-      }
+      data.recipes.forEach((recipe) => {
+        recipe.ustensils.forEach((ustensil) => {
+          array.push(ustensil.toLowerCase());
+        });
+      });
       sortedData = sortData(array, searchTerm);
     } else {
       console.error("Type de données non pris en charge.");
@@ -217,12 +215,11 @@ const dropdowns = [
 ];
 
 const closeAllDropdowns = () => {
-  for (let i = 0; i < dropdowns.length; i++) {
-    const dropdown = dropdowns[i];
+  dropdowns.forEach((dropdown) => {
     const dropdownIngredient = document.getElementById(dropdown.id);
     dropdownIngredient.innerHTML = "";
     dropdown.arrow.setAttribute("src", "./assets/img/arrow-down.webp");
-  }
+  });
 };
 
 const arrow_dropDown = (arrow, id, search, item1, item2, item3) => {
@@ -260,10 +257,9 @@ const arrow_dropDown = (arrow, id, search, item1, item2, item3) => {
   });
 };
 
-for (let i = 0; i < dropdowns.length; i++) {
-  const { arrow, id, search, item1, item2, item3 } = dropdowns[i];
+dropdowns.forEach(({ arrow, id, search, item1, item2, item3 }) => {
   arrow_dropDown(arrow, id, search, item1, item2, item3);
-}
+});
 
 /**
  * Create a design a dropdown for each element
@@ -298,10 +294,9 @@ const dropDownElement = async (id, id_search, search, dataType) => {
   const listItems = document.querySelectorAll(
     ".flex.xl\\:justify-between.lg\\:flex-row.flex-col > ul > li"
   );
-  for (let i = 0; i < listItems.length; i++) {
-    const item = listItems[i];
+  listItems.forEach((item) => {
     item.classList.add("relative", "overscroll", "h-12", "z-50", "rounded-md");
-  }
+  });
   searchInput.placeholder = search;
   dropDown.appendChild(searchInput);
 
@@ -356,8 +351,7 @@ const populateDropdown = (uniqueRecipe, deviceList, searchInput) => {
  * @param {*} list
  */
 const updateDropdown = (deviceList, list) => {
-  for (let i = 0; i < list.length; i++) {
-    const item = list[i];
+  list.forEach((item) => {
     const li = document.createElement("li");
     li.innerHTML = item;
     li.classList.add(
@@ -371,7 +365,7 @@ const updateDropdown = (deviceList, list) => {
     );
     li.setAttribute("role", "option");
     deviceList.appendChild(li);
-  }
+  });
 };
 /**
  * Create element for the dropdown
@@ -409,13 +403,12 @@ const globalElement = (dataType, deviceList) => {
  */
 const filterElement = (search, limited, list) => {
   list.innerHTML = "";
-  for (let i = 0; i < limited.length; i++) {
-    const item = limited[i];
+  limited.forEach((item) => {
     if (item.toLowerCase().startsWith(search)) {
       const li = document.createElement("li");
       list.appendChild(li);
     }
-  }
+  });
 };
 
 /**
@@ -425,24 +418,18 @@ const filterElement = (search, limited, list) => {
 const filterRecipes = () => {
   const recipesToFilter = searchBool ? matchingRecipes : data.recipes;
 
-  let filteredRecipes = [];
-  for (let i = 0; i < recipesToFilter.length; i++) {
-    const recipe = recipesToFilter[i];
-    if (
-      selectedLabels.every((label) => {
-        return (
-          recipe.ingredients.some(
-            (ingredientObj) =>
-              ingredientObj.ingredient.toLowerCase() === label.toLowerCase()
-          ) ||
-          recipe.appliance.toLowerCase() === label.toLowerCase() ||
-          recipe.ustensils.some((u) => u.toLowerCase() === label.toLowerCase())
-        );
-      })
-    ) {
-      filteredRecipes.push(recipe);
-    }
-  }
+  let filteredRecipes = recipesToFilter.filter((recipe) => {
+    return selectedLabels.every((label) => {
+      return (
+        recipe.ingredients.some(
+          (ingredientObj) =>
+            ingredientObj.ingredient.toLowerCase() === label.toLowerCase()
+        ) ||
+        recipe.appliance.toLowerCase() === label.toLowerCase() ||
+        recipe.ustensils.some((u) => u.toLowerCase() === label.toLowerCase())
+      );
+    });
+  });
 
   tagTab = [filteredRecipes];
   return filteredRecipes;
@@ -551,11 +538,7 @@ const removeFilter = (dropdownElement) => {
 // Mettre à jour la liste des cartes avec les recettes filtrées
 const updateRecipeList = (recipes) => {
   if (recipes && recipes.length > 0) {
-    let matchingCards = "";
-    for (let i = 0; i < recipes.length; i++) {
-      const recipe = recipes[i];
-      matchingCards += card(recipe);
-    }
+    let matchingCards = recipes.map((recipe) => card(recipe)).join("");
     cards.innerHTML = matchingCards;
     quantity.innerHTML =
       recipes.length + (recipes.length > 1 ? " recettes" : " recette");
@@ -625,11 +608,11 @@ const displayRecipe = async () => {
     const response = await fetch("api/recipes.json");
     data = await response.json();
     quantity.innerHTML = data.recipes.length + " recettes";
-    let recipesList = "";
-    for (let i = 0; i < data.recipes.length; i++) {
-      const recipe = data.recipes[i];
-      recipesList += card(recipe);
-    }
+    const recipesList = data.recipes
+      .map((recipe) => {
+        return card(recipe);
+      })
+      .join("");
     return `${recipesList}`;
   } catch (error) {
     console.error(error);
