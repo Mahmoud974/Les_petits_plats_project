@@ -1,0 +1,1 @@
+Testez la perfommance avec [Jsben.ch](https://jsben.ch/I5YYp)
